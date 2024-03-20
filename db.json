@@ -118,19 +118,6 @@
           "level": 250
         }
       ]
-    },
-    {
-      "id": "7",
-      "name": "Test124",
-      "level": 1,
-      "class": "123",
-      "professions": [
-        {
-          "name": "123",
-          "level": 0,
-          "note": ""
-        }
-      ]
     }
   ]
 }

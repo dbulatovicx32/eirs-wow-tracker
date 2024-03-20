@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Character } from '../characters/characters';
 import { JsonPipe } from '@angular/common';
 import { CharacterService } from '../character.service';
+import { CharacterEventService } from '../characters/CharacterEventService';
 
 @Component({
   selector: 'app-character-card',
@@ -29,13 +30,15 @@ export class CharacterCardComponent {
   @Output() onEditCharacter = new EventEmitter<string>();
   @Output() ondDeleteCharacter = new EventEmitter<string>();
   characterService = inject(CharacterService);
+  characterEventService = inject(CharacterEventService);
 
-  editCharacter(){
-    this.onEditCharacter.emit(this.character.id)
+  editCharacter() {
+    this.onEditCharacter.emit(this.character.id);
   }
-
-  deleteCharacter(characterId: string){
-  //  this.characterService.deleteCharacter(characterId)
+  deleteCharacter(characterId: string) {
+    this.characterService.deleteCharacter(characterId).then(() => {
+      this.characterEventService.notifyCharacterUpdated();
+    });
   }
 
   getClassImage() {
@@ -81,7 +84,7 @@ export class CharacterCardComponent {
       case 'Warlock':
         return '#8788EE';
       case 'Warrior':
-        return '	#C69B6D';
+        return '#C69B6D';
       default:
         return '#A330C9';
     }

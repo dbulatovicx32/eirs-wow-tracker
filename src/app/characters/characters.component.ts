@@ -4,6 +4,8 @@ import { CharacterFormComponent } from '../character-form/character-form.compone
 import { Character } from './characters';
 import { CharacterService } from '../character.service';
 import { CommonModule } from '@angular/common';
+import { CharacterEventService } from './CharacterEventService';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-characters',
@@ -15,8 +17,7 @@ import { CommonModule } from '@angular/common';
       <app-character-card
         *ngFor="let character of filteredCharacterList"
         [character]="character"
-        (onEditCharacter)="openCharacterForm($event)" 
-        />
+        (onEditCharacter)="openCharacterForm($event)" />
     </div>
 
     <app-character-form *ngIf="isFormVisible" [characterId]="selectedCharacterId" (submit)="closeForm()" (close)="closeForm()" />
@@ -30,19 +31,34 @@ import { CommonModule } from '@angular/common';
   styleUrl: './characters.component.scss',
 })
 export class CharactersComponent {
-  characterService: CharacterService = inject(CharacterService);
+  private eventsSubscription: Subscription = new Subscription();
   characterList: Character[] = [];
   filteredCharacterList: Character[] = [];
   isFormVisible: boolean = false;
   selectedCharacterId: string = '';
 
-  constructor() {
-    this.characterService.getAllCharacters().then(characterList => {
-      this.characterList = characterList;
-      this.filteredCharacterList = characterList;
+  constructor(private characterService: CharacterService, private characterEventService: CharacterEventService) {}
+
+  ngOnInit() {
+    this.loadCharacters();
+    this.eventsSubscription = this.characterEventService.characterUpdated$.subscribe(() => {
+      this.loadCharacters();
     });
   }
+  ngOnDestroy() {
+    if (this.eventsSubscription) this.eventsSubscription.unsubscribe();
+  }
 
+  async loadCharacters() {
+    try {
+      await this.characterService.getAllCharacters().then((characters: Character[]) => {
+        this.characterList = characters;
+        this.filteredCharacterList = characters;
+      });
+    } catch (err) {
+      console.error('Failed to load characters', err);
+    }
+  }
   async addNewCharacter(): Promise<void> {
     try {
       this.selectedCharacterId = await this.characterService.getNextDbId();
@@ -56,17 +72,11 @@ export class CharactersComponent {
     this.selectedCharacterId = characterId;
     this.toggleFormVisibility();
   }
-
   toggleFormVisibility(): void {
     this.isFormVisible = !this.isFormVisible;
   }
-
   closeForm(): void {
     this.isFormVisible = false;
-    this.selectedCharacterId = ''
-  }
-
-  logMe(event: any) {
-    console.log(event);
+    this.selectedCharacterId = '';
   }
 }

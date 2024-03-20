@@ -3,6 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, 
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CharacterService } from '../character.service';
 import { Character, Profession } from '../characters/characters';
+import { CharacterEventService } from '../characters/CharacterEventService';
 
 @Component({
   selector: 'app-character-form',
@@ -82,6 +83,7 @@ export class CharacterFormComponent implements OnInit {
   @ViewChild('dialogRef') dialogRef!: ElementRef<HTMLDialogElement>;
   characterForm!: FormGroup;
   characterService = inject(CharacterService);
+  characterEventService = inject(CharacterEventService);
 
   constructor(private formBuilder: FormBuilder) {}
 
@@ -135,33 +137,26 @@ export class CharacterFormComponent implements OnInit {
 
     if (this.characterForm.valid) {
       const formData = this.characterForm.getRawValue() as Character;
-      if (this.characterId === 'new') this.createNewCharacter(formData);
-      else this.updateCharacter(formData);
+      this.saveCharacter(formData);
     } else {
-      console.error('Form is not valid!'); //move to toast or warning?
+      console.error('Form is not valid!'); //  toast or warning notification
     }
   }
 
-  async createNewCharacter(formData: Character) {
-    try {
-      await this.characterService.createNewCharacter(formData);
-      console.log('Character created successfully!'); //move to toast
+  async saveCharacter(formData: Character) {
+    const isCreating = this.characterId === 'new';
+    const operation = isCreating ? 'created' : 'updated';
 
+    try {
+      isCreating
+        ? await this.characterService.createNewCharacter(formData)
+        : await this.characterService.updateCharacter({ ...formData, id: this.characterId });
+
+      console.log(`Character ${operation} successfully!`); // toast notification
+      this.characterEventService.notifyCharacterUpdated();
       this.submit.emit();
     } catch (error) {
-      console.error('Error creating character', error); //move to toast
-    }
-  }
-
-  async updateCharacter(formData: Character) {
-    try {
-      await this.characterService.updateCharacter(formData);
-      console.log('Character updated successfully!'); //move to toast
-
-      this.characterForm.reset();
-      this.submit.emit();
-    } catch (error) {
-      console.error('Error updating character', error); //move to toast
+      console.error(`Error ${operation} character`, error); // toast notification
     }
   }
 
