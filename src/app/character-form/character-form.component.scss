@@ -1,0 +1,6 @@
+.profession-card {
+    border-radius: var(--rounded-btn, 0.5rem);
+    border-width: 1px;
+    border-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+    padding: 20px;
+}
