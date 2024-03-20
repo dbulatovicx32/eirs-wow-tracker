@@ -4,6 +4,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular
 import { CharacterService } from '../character.service';
 import { Character, Profession } from '../characters/characters';
 import { CharacterEventService } from '../characters/CharacterEventService';
+import { AVAILABLE_CLASSES, AVAILABLE_PROFESSIONS } from '../characters/constants';
 
 @Component({
   selector: 'app-character-form',
@@ -25,8 +26,13 @@ import { CharacterEventService } from '../characters/CharacterEventService';
 
             <div class="flex flex-col w-full md:w-1/2 px-3 mb-3">
               <label> Class </label>
-              <input formControlName="class" class="input input-bordered input-sm w-full" />
+              <select formControlName="class" class="select select-bordered select-sm w-full">
+                <option *ngFor="let class of availableClasses; let i = index">
+                  {{ class }}
+                </option>
+              </select>
             </div>
+
             <div class="flex flex-col w-full md:w-1/2 px-3 mb-3">
               <label> Level </label>
               <input formControlName="level" class="input input-bordered input-sm w-full" type="number" />
@@ -45,7 +51,11 @@ import { CharacterEventService } from '../characters/CharacterEventService';
               <div class="flex flex-wrap -mx-3">
                 <div class="flex flex-col w-full md:w-1/2 px-3 mb-3">
                   <label> Name </label>
-                  <input formControlName="name" class="input input-bordered input-sm w-full" />
+                  <select formControlName="name" class="select select-bordered select-sm w-full">
+                    <option *ngFor="let profession of availableProfessions; let i = index">
+                      {{ profession }}
+                    </option>
+                  </select>
                 </div>
                 <div class="flex flex-col w-full md:w-1/2 px-3 mb-3">
                   <label> Level </label>
@@ -84,6 +94,8 @@ export class CharacterFormComponent implements OnInit {
   characterForm!: FormGroup;
   characterService = inject(CharacterService);
   characterEventService = inject(CharacterEventService);
+  availableClasses: string[] = AVAILABLE_CLASSES;
+  availableProfessions: string[] = AVAILABLE_PROFESSIONS;
 
   constructor(private formBuilder: FormBuilder) {}
 
