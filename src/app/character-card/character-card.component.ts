@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject } from '@angular/core';
 import { Character } from '../characters/characters';
 import { JsonPipe } from '@angular/common';
 import { CharacterService } from '../character.service';
@@ -10,19 +10,32 @@ import { AppEventService } from '../appEvent.service';
   standalone: true,
   imports: [JsonPipe],
   template: `
-    <div class="card bg-base-100 shadow-xl image-full">
+    <div class="card bg-base-100  image-full group">
       <figure style="background-color:{{ getClassColor() }}"><img src="{{ getClassImage() }}" style="height: 200px;" /></figure>
       <div class="card-body">
         <h2 class="card-title">{{ character.name }}</h2>
         <p>lv.{{ character.level }} {{ character.class }}</p>
         <!-- <p>{{ character.professions | json }}</p> -->
         <!-- <div class="card-actions justify-end"> -->
-        <div class="card-actions justify-end">
+        <div class="card-actions justify-end opacity-0 group-hover:opacity-100">
           <button class="btn-xs btn-circle btn-outline material-icons" (click)="editCharacter()">edit</button>
-          <button class="btn-xs btn-circle btn-outline material-icons" (click)="deleteCharacter(character.id)">delete</button>
+          <button class="btn-xs btn-circle btn-outline material-icons" (click)="deleteCharacterConfirm()">delete</button>
         </div>
       </div>
     </div>
+
+    <dialog #dialogRef id="my_modal_1" class="modal sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Warning</h3>
+        <p class="pb-3">Are you sure you want to delete this character?</p>
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn btn-sm">no</button>
+            <button class="btn btn-sm btn-warning ml-3" (click)="deleteCharacter(character.id)">yes</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
   `,
   styleUrl: './character-card.component.scss',
 })
@@ -30,6 +43,7 @@ export class CharacterCardComponent {
   @Input() character!: Character;
   @Output() onEditCharacter = new EventEmitter<string>();
   @Output() ondDeleteCharacter = new EventEmitter<string>();
+  @ViewChild('dialogRef') dialogRef!: ElementRef<HTMLDialogElement>;
   characterService = inject(CharacterService);
   characterEventService = inject(CharacterEventService);
   appEventService = inject(AppEventService);
@@ -40,15 +54,19 @@ export class CharacterCardComponent {
   deleteCharacter(characterId: string) {
     console.log('deleting', characterId);
 
-    try {
-      this.characterService.deleteCharacter(characterId).then(() => {
-        this.appEventService.notifyShowToast({ message: 'Character deleted.', severity: 'success' });
-        this.characterEventService.notifyCharacterUpdated();
-      });
-    } catch (error) {
-      this.appEventService.notifyShowToast({ message: 'Error deleting character.', severity: 'error' });
-      console.error(`Error`, error);
-    }
+    // try {
+    //   this.characterService.deleteCharacter(characterId).then(() => {
+    //     this.appEventService.notifyShowToast({ message: 'Character deleted.', severity: 'success' });
+    //     this.characterEventService.notifyCharacterUpdated();
+    //   });
+    // } catch (error) {
+    //   this.appEventService.notifyShowToast({ message: 'Error deleting character.', severity: 'error' });
+    //   console.error(`Error`, error);
+    // }
+  }
+
+  deleteCharacterConfirm(): void {
+    this.dialogRef.nativeElement.showModal();
   }
 
   getClassImage() {

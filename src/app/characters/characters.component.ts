@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CharacterCardComponent, CharacterFormComponent, CommonModule],
   template: `
-    {{ isFormVisible }}
     <div class="m-3 grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-3">
       <app-character-card
         *ngFor="let character of filteredCharacterList"

@@ -158,6 +158,19 @@
           "note": ""
         }
       ]
+    },
+    {
+      "id": "10",
+      "name": "test7",
+      "level": 1,
+      "class": "",
+      "professions": [
+        {
+          "name": "",
+          "level": 0,
+          "note": ""
+        }
+      ]
     }
   ]
 }
