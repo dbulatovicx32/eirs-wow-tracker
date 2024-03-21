@@ -3,3 +3,7 @@
   width: 100%;
   overflow: auto;
 }
+
+:host::-webkit-scrollbar {
+  display: none;
+}

@@ -171,6 +171,19 @@
           "note": ""
         }
       ]
+    },
+    {
+      "id": "11",
+      "name": "",
+      "level": 1,
+      "class": "",
+      "professions": [
+        {
+          "name": "",
+          "level": 0,
+          "note": ""
+        }
+      ]
     }
   ]
 }

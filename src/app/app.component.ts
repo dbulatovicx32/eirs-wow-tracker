@@ -24,15 +24,15 @@ import { CommonModule } from '@angular/common';
             </ul>
           </div>
         </div>
-        
+
         <div class="navbar-center">
           <a class="btn btn-ghost btn-sm text-xl">grind tracker</a>
         </div>
 
         <div class="navbar-end">
           <div class="dropdown dropdown-end z-50">
-            <div tabindex="0" role="button" class="btn btn-sm btn-ghost m-1">
-              <button class="btn-xs btn-circle btn-sm material-icons-outlined">format_paint</button>
+            <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost m-1">
+              <i class="material-icons-outlined" style="font-size: 20px;">format_paint</i>
             </div>
             <ul tabindex="0" class="dropdown-content z-[1] p-2 shadow-2xl bg-base-300 rounded-box w-32">
               <li *ngFor="let theme of availableThemes; let i = index">
