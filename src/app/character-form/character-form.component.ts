@@ -1,19 +1,22 @@
-import { NgFor } from '@angular/common';
+import { NgFor, NgClass, JsonPipe } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CharacterService } from '../character.service';
 import { Character, Profession } from '../characters/characters';
 import { CharacterEventService } from '../characters/CharacterEventService';
 import { AVAILABLE_CLASSES, AVAILABLE_PROFESSIONS } from '../characters/constants';
+import { AppEventService } from '../appEvent.service';
 
 @Component({
   selector: 'app-character-form',
   standalone: true,
-  imports: [NgFor, ReactiveFormsModule],
+  imports: [NgFor, NgClass, JsonPipe, ReactiveFormsModule],
   template: `
     <dialog #dialogRef id="my_modal_2" class="modal">
       <div class="modal-box">
         <form class="w-full max-w-lg" [formGroup]="characterForm" (ngSubmit)="onSubmit()">
+          {{ characterForm.value | json }}
+          {{ characterForm.invalid }}
           <div class="flex flex-wrap -mx-3 mb-3">
             <div class="flex flex-col w-full px-3 mb-3">
               <label class="self-center"> ID </label>
@@ -21,7 +24,9 @@ import { AVAILABLE_CLASSES, AVAILABLE_PROFESSIONS } from '../characters/constant
             </div>
             <div class="flex flex-col w-full px-3 mb-3">
               <label> Name </label>
-              <input formControlName="name" class="input input-bordered input-sm w-full" />
+              <!-- [ngClass]="{ 'input-error': name.invalid && (name.dirty || name.touched) }" /> -->
+
+              <input id="name" formControlName="name" class="input input-bordered input-sm w-full" />
             </div>
 
             <div class="flex flex-col w-full md:w-1/2 px-3 mb-3">
@@ -94,6 +99,7 @@ export class CharacterFormComponent implements OnInit {
   characterForm!: FormGroup;
   characterService = inject(CharacterService);
   characterEventService = inject(CharacterEventService);
+  appEventService = inject(AppEventService);
   availableClasses: string[] = AVAILABLE_CLASSES;
   availableProfessions: string[] = AVAILABLE_PROFESSIONS;
 
@@ -102,9 +108,9 @@ export class CharacterFormComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.characterForm = this.formBuilder.group({
       id: [{ value: this.characterId, disabled: true }],
-      name: [''],
-      level: [1],
-      class: [''],
+      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(15)]],
+      level: [1, [Validators.required, Validators.min(1), Validators.max(60)]],
+      class: ['', Validators.required],
       professions: this.formBuilder.array([]),
     });
 
@@ -127,18 +133,16 @@ export class CharacterFormComponent implements OnInit {
       this.addProfession();
     }
   }
-
   get professions(): FormArray {
     return this.characterForm.get('professions') as FormArray;
   }
   removeProfession(index: number): void {
     this.professions.removeAt(index);
   }
-
   addProfession(profession: Profession = { name: '', level: 0, note: '' }): void {
     const professionFormGroup = this.formBuilder.group({
-      name: [profession.name || ''],
-      level: [profession.level || 0],
+      name: [profession.name || '', [Validators.required, Validators.minLength(1), Validators.maxLength(15)]],
+      level: [profession.level || 0, [Validators.required, Validators.min(1), Validators.max(60)]],
       note: [profession.note || ''],
     });
     this.professions.push(professionFormGroup);
@@ -147,14 +151,14 @@ export class CharacterFormComponent implements OnInit {
   onSubmit(): void {
     console.log(this.characterForm.value);
 
-    if (this.characterForm.valid) {
+    if (!this.characterForm.valid) {
       const formData = this.characterForm.getRawValue() as Character;
       this.saveCharacter(formData);
     } else {
-      console.error('Form is not valid!'); //  toast or warning notification
+      //button should be disabled if invalid, remove whole if block after implementing validation
+      this.appEventService.notifyShowToast({ message: `Toast is not valid, check for errors`, severity: 'warning' });
     }
   }
-
   async saveCharacter(formData: Character) {
     const isCreating = this.characterId === 'new';
     const operation = isCreating ? 'created' : 'updated';
@@ -164,16 +168,20 @@ export class CharacterFormComponent implements OnInit {
         ? await this.characterService.createNewCharacter(formData)
         : await this.characterService.updateCharacter({ ...formData, id: this.characterId });
 
-      console.log(`Character ${operation} successfully!`); // toast notification
+      this.appEventService.notifyShowToast({ message: `Character ${operation} successfully!`, severity: 'success' });
       this.characterEventService.notifyCharacterUpdated();
       this.submit.emit();
     } catch (error) {
-      console.error(`Error ${operation} character`, error); // toast notification
+      this.appEventService.notifyShowToast({ message: `Error ${operation} character`, severity: 'error' });
     }
   }
 
   closeForm(): void {
     this.dialogRef.nativeElement.close();
     this.close.emit();
+  }
+
+  get name() {
+    return this.characterForm.get('name') ?? '';
   }
 }

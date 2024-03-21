@@ -20,8 +20,8 @@
     {
       "id": "2",
       "name": "Eir",
-      "class": "Druid",
       "level": 69,
+      "class": "Druid",
       "professions": [
         {
           "name": "Engineering",
@@ -30,7 +30,8 @@
         },
         {
           "name": "First Aid",
-          "level": 250
+          "level": 250,
+          "note": ""
         }
       ]
     },
@@ -116,6 +117,45 @@
         {
           "name": "First Aid",
           "level": 250
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "test1",
+      "level": 1,
+      "class": "",
+      "professions": [
+        {
+          "name": "",
+          "level": 0,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "name": "test2",
+      "level": 1,
+      "class": "",
+      "professions": [
+        {
+          "name": "",
+          "level": 0,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "name": "test3",
+      "level": 1,
+      "class": "",
+      "professions": [
+        {
+          "name": "",
+          "level": 0,
+          "note": ""
         }
       ]
     }

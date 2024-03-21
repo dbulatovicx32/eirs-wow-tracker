@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ToastNotificationComponent } from './toast-notification/toast-notification.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, ToastNotificationComponent],
   template: `
     <main class="flex flex-col h-full w-full">
       <div class="navbar bg-base-200 z-50">
@@ -34,6 +35,7 @@ import { RouterModule } from '@angular/router';
         </div>
       </div>
       <router-outlet></router-outlet>
+      <app-toast-notification />
     </main>
   `,
   styleUrl: './app.component.scss',

@@ -3,6 +3,7 @@ import { Character } from '../characters/characters';
 import { JsonPipe } from '@angular/common';
 import { CharacterService } from '../character.service';
 import { CharacterEventService } from '../characters/CharacterEventService';
+import { AppEventService } from '../appEvent.service';
 
 @Component({
   selector: 'app-character-card',
@@ -31,14 +32,23 @@ export class CharacterCardComponent {
   @Output() ondDeleteCharacter = new EventEmitter<string>();
   characterService = inject(CharacterService);
   characterEventService = inject(CharacterEventService);
+  appEventService = inject(AppEventService);
 
   editCharacter() {
     this.onEditCharacter.emit(this.character.id);
   }
   deleteCharacter(characterId: string) {
-    this.characterService.deleteCharacter(characterId).then(() => {
-      this.characterEventService.notifyCharacterUpdated();
-    });
+    console.log('deleting', characterId);
+
+    try {
+      this.characterService.deleteCharacter(characterId).then(() => {
+        this.appEventService.notifyShowToast({ message: 'Character deleted.', severity: 'success' });
+        this.characterEventService.notifyCharacterUpdated();
+      });
+    } catch (error) {
+      this.appEventService.notifyShowToast({ message: 'Error deleting character.', severity: 'error' });
+      console.error(`Error`, error);
+    }
   }
 
   getClassImage() {
